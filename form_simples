@@ -1,0 +1,134 @@
+Private Sub Text1_GotFocus()
+   On Error Resume Next
+   Text1.SelStart = 0
+   Text1.SelLength = Len(Text1.Text)
+End Sub
+
+Private Sub Text1_KeyPress(KeyAscii As Integer)
+   KeyAscii = Asc(UCase(Chr(KeyAscii)))
+End Sub
+
+Private Sub Text2_GotFocus()
+   On Error Resume Next
+   Text2.SelStart = 0
+   Text2.SelLength = Len(Text2.Text)
+End Sub
+
+Private Sub Text2_KeyPress(KeyAscii As Integer)
+   KeyAscii = Asc(UCase(Chr(KeyAscii)))
+End Sub
+
+Private Sub btnAlterar_Click()
+    Dim selectSQL As String
+    Dim rec As New ADODB.Recordset
+    
+    Set rec = cnMysql.Execute("select usuario,senha from table_example where usuario ='" & txtLogin.Text & "'")
+
+    If rec.EOF Then
+        MsgBox "login não encontrado na base de dados", vbCritical
+        Exit Sub
+    End If
+    
+    If MsgBox("Deseja relmente alterar a senha deste usuario?", vbYesNo + vbQuestion) = vbYes Then
+        selectSQL = "UPDATE table_example SET usuario = '" & txtLogin.Text & "', senha ='" & txtSenha.Text & "' WHERE usuario = '" & txtLogin.Text & "'"
+        cnMysql.Execute selectSQL
+        MsgBox "Registro Alterado com Sucesso!"
+        LimparCampos
+    Else
+        MsgBox "Informações não alteradas"
+    End If
+End Sub
+
+Private Sub btnCadastrar_Click()
+    Dim selectSQL As String
+    selectSQL = "INSERT INTO table_example VALUES ('" & txtLogin.Text & "','" & txtSenha.Text & "')"
+    cnMysql.Execute selectSQL
+    MsgBox "Login Cadastrado com sucesso!"
+    LimparCampos
+End Sub
+
+Private Sub btnExcluir_Click()
+    Dim selectSQL As String
+    selectSQL = "DELETE FROM table_example WHERE usuario='" & txtLogin.Text & "'"
+    cnMysql.Execute selectSQL
+    MsgBox "Registro Excluido com sucesso!"
+    LimparCampos
+End Sub
+
+Private Sub btnLogin_Click()
+    
+    Dim rec As New ADODB.Recordset
+    Dim Usuario As String
+    Dim Senha As String
+    Set rec = cnMysql.Execute("select usuario,senha from table_example where Usuario='" & txtLogin.Text & "'")
+    If rec.EOF Then
+        MsgBox "login nao encontrado na Base De Dados"
+        Exit Sub
+    End If
+    Usuario = rec(0)
+    Senha = rec(1)
+    
+    If txtLogin.Text = Usuario Then
+        If txtSenha.Text = Senha Then
+            MsgBox "login efetuado com sucesso"
+
+        Else
+            MsgBox "senha errada"
+            txtLogin.Text = ""
+            txtSenha.Text = ""
+        End If
+    Else
+        MsgBox "Login errado"
+        txtLogin.Text = ""
+        txtSenha.Text = ""
+    End If
+        
+    
+End Sub
+
+Private Sub Form_Load()
+    abre_banco
+End Sub
+
+Private Sub txtLogin_GotFocus()
+    txtLogin.BackColor = &H8000000D
+    txtLogin.ForeColor = &HFFFFFF
+End Sub
+Private Sub txtLogin_LostFocus()
+    txtLogin.BackColor = &H80000005
+    txtLogin.ForeColor = &H80000012
+End Sub
+
+Private Sub txtSenha_GotFocus()
+    txtSenha.BackColor = &H8000000D
+    txtSenha.ForeColor = &HFFFFFF
+End Sub
+Private Sub txtSenha_LostFocus()
+    txtSenha.BackColor = &H80000005
+    txtSenha.ForeColor = &H80000012
+End Sub
+Private Sub LimparCampos()
+    txtLogin.Text = ""
+    txtSenha.Text = ""
+End Sub
+
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
+
+    Select Case KeyCode
+        
+        Case vbKeyEscape
+        Unload Me
+    
+        Case vbKeyF1
+        btnLogin_Click
+        
+        Case vbKeyF2
+        btnExcluir_Click
+        
+        Case vbKeyF3
+        btnAlterar_Click
+        
+        Case vbKeyF4
+        btnCadastrar_Click
+    End Select
+End Sub
