@@ -1,0 +1,804 @@
+Private Sub btnAlterar_Click()
+    If TRAZ("SELECT COUNT(PESS_CODIGO) FROM PESSOAS WHERE PESS_CODIGO = '" & txtCodigo.Text & "' and PESS_STATUS = 'A'") = "1" Then
+    
+        If txtNome.Text = "" Then
+            MsgBox "Preencha o campo Nome!", vbCritical
+            txtNome.SetFocus
+            Exit Sub
+        End If
+        
+        If mskCpf.Text = "___.___.___-__" Then
+            MsgBox "Obrigatorio o preenchimento do CPF", vbCritical
+            mskCpf.SetFocus
+            Exit Sub
+        End If
+        
+        If mskDataNasc.Text = "__/__/____" Then
+            MsgBox "Preencha a data de nascimento!", vbCritical
+            Exit Sub
+        End If
+        
+        GRAVAR "PESS_CODIGO", txtCodigo.Text
+        GRAVAR "PESS_DATAHORA", CTOD(txtDataHora, True)
+        GRAVAR "PESS_NOME", txtNome.Text
+        GRAVAR "PESS_CPF", mskCpf.Text
+        GRAVAR "PESS_RG", mskRg.Text
+        GRAVAR "PESS_FILIACAOMAE", txtFiliacaoMae.Text
+        GRAVAR "PESS_FILIACAOPAI", txtFiliacaoPai.Text
+        GRAVAR "PESS_EMAIL", txtEmail.Text
+        GRAVAR "PESS_DATANASC", Replace(Format(mskDataNasc.Text, "yyyy-mm-dd"), "-", "/")
+        GRAVAR "PESS_CELULAR", txtCelular.Text
+        
+        If cbSexo.Text = "Masculino" Then
+            GRAVAR "PESS_SEXO", "M"
+        ElseIf cbSexo.Text = "Feminino" Then
+            GRAVAR "PESS_SEXO", "F"
+        End If
+            
+        If cbDecPessoa = "Fisica" Then
+            GRAVAR "PESS_DECPESSOA", "PF"
+        ElseIf cbDecPessoa = "Juridica" Then
+            GRAVAR "PESS_DECPESSOA", "PJ"
+        End If
+    
+        GRAVAR "PESS_STATUS", "A"
+        Update "PESSOAS", "PESS_CODIGO = '" & txtCodigo.Text & "'"
+        
+        MsgBox "Cliente alterado com sucesso!", vbInformation
+        
+        limparCampos
+        
+        txtDataHora.Text = Now
+        txtCodigo.Text = ULTCOD("PESS_CODIGO", "PESSOAS")
+        txtCodigo.SelStart = Len(txtCodigo.Text)
+        txtNome.SetFocus
+        
+    Else
+        PES_STATUS = "E"
+        MsgBox "Cliente Inexistente ou excluido!", vbInformation
+        txtCodigo.SelStart = Len(txtCodigo.Text)
+        txtCodigo.SetFocus
+    End If
+    
+End Sub
+
+Private Sub btnExcluir_Click()
+    If TRAZ("SELECT COUNT(PESS_CODIGO) FROM PESSOAS WHERE PESS_CODIGO = '" & txtCodigo.Text & "' and PESS_STATUS = 'A'") = "1" Then
+        carregaCliente
+        If MsgBox("Deseja realmente excluir este cliente?", vbYesNo + vbQuestion, "Excluir?") = vbYes Then
+            GRAVAR "PESS_STATUS", "E"
+            Update "PESSOAS", "PESS_CODIGO = '" & txtCodigo.Text & "'"
+            
+            MsgBox "Cliente excluido com sucesso!", vbInformation
+            limparCampos
+            txtDataHora.Text = Now
+            txtCodigo.Text = ULTCOD("PESS_CODIGO", "PESSOAS")
+            txtNome.SetFocus
+            txtNome.SelStart = Len(txtNome.Text)
+        End If
+    Else
+        MsgBox "Cliente inexistente ou excluido!", vbInformation
+        limparCampos
+        txtDataHora.Text = Now
+        txtCodigo.Text = ULTCOD("PESS_CODIGO", "PESSOAS")
+        txtNome.SetFocus
+        txtNome.SelStart = Len(txtNome.Text)
+    End If
+End Sub
+
+Private Sub btnNovo_Click()
+    Form_Load
+    
+    txtNome.SetFocus
+    
+    limparCampos
+    
+    txtDataHora.Text = Now
+    txtCodigo.Text = ULTCOD("PESS_CODIGO", "PESSOAS")
+    txtCodigo.SelStart = Len(txtCodigo.Text)
+End Sub
+
+Private Sub btnSalvar_Click()
+    If TRAZ("SELECT count(PESS_CODIGO) FROM PESSOAS WHERE PESS_CODIGO ='" & txtCodigo.Text & "'") = "1" Then
+    
+        MsgBox "Cliente já cadastrado", vbInformation
+        limparCampos
+        txtCodigo.Text = ULTCOD("PESS_CODIGO", "PESSOAS")
+        txtDataHora.Text = Now
+        txtNome.SetFocus
+        txtNome.SelStart = Len(txtCodigo.Text)
+        Exit Sub
+    Else
+        If txtNome.Text = "" Then
+            MsgBox "Preench o campo Nome!", vbCritical
+            txtNome.SetFocus
+            Exit Sub
+        End If
+        
+        If mskCpf.Text = "___.___.___-__" Then
+            MsgBox "Obrigatorio o Preenchimento do CPF", vbCritical
+            mskCpf.SetFocus
+            Exit Sub
+         End If
+        
+        If mskDataNasc.Text = "__/__/____" Then
+            MsgBox "Preencha a Data de Nascimento!", vbCritical
+            mskDataNasc.SetFocus
+            Exit Sub
+        End If
+        
+        GRAVAR "PESS_CODIGO", txtCodigo.Text
+        GRAVAR "PESS_DATAHORA", CTOD(txtDataHora, True)
+        GRAVAR "PESS_NOME", txtNome.Text
+        GRAVAR "PESS_CPF", mskCpf.Text
+        GRAVAR "PESS_RG", mskRg.Text
+        GRAVAR "PESS_FILIACAOMAE", txtFiliacaoMae.Text
+        GRAVAR "PESS_FILIACAOPAI", txtFiliacaoPai.Text
+        GRAVAR "PESS_EMAIL", txtEmail.Text
+        GRAVAR "PESS_DATANASC", Replace(Format(mskDataNasc.Text, "yyyy-mm-dd"), "-", "/")
+        GRAVAR "PESS_CELULAR", txtCelular.Text
+        GRAVAR "PESS_OBSERVACOES", txtObservacao.Text
+        
+        If cbSexo.Text = "Masculino" Then
+            GRAVAR "PESS_SEXO", "M"
+        ElseIf cbSexo.Text = "Feminino" Then
+            GRAVAR "PESS_SEXO", "F"
+        End If
+        
+        If cbDecPessoa = "Fisica" Then
+            GRAVAR "PESS_DECPESSOA", "PF"
+        ElseIf cbDecPessoa = "Juridica" Then
+            GRAVAR "PESS_DECPESSOA", "PJ"
+        End If
+        
+        If chVista.Value = 1 Then
+            GRAVAR "PESS_FORMA_AVISTA", "S"
+        End If
+        
+        If chCredito.Value = 1 Then
+            GRAVAR "PESS_FORMA_CCREDITO", "S"
+        End If
+        
+        If chCheque.Value = 1 Then
+            GRAVAR "PESS_FORMA_CHEQUE", "S"
+        End If
+        
+        If chPix.Value = 1 Then
+            GRAVAR "PESS_FORMA_PIX", "S"
+        End If
+        
+        If chPrazo.Value = 1 Then
+            GRAVAR "PESS_FORMA_APRAZO", "S"
+        End If
+        
+        If chDebito.Value = 1 Then
+            GRAVAR "PESS_FORMA_CDEBITO", "S"
+        End If
+        
+        If chTodas.Value = 1 Then
+            GRAVAR "PESS_FORMA_TODAS", "S"
+        End If
+        
+        MsgBox "Cliente cadastrado com sucesso", vbInformation
+        GRAVAR "PESS_STATUS", "A"
+        
+        Insert "PESSOAS"
+        
+        limparCampos
+        
+        txtCodigo.Text = ULTCOD("PESS_CODIGO", "PESSOAS")
+        txtDataHora.Text = Now
+        txtNome.SetFocus
+        txtNome.SelStart = Len(txtCodigo.Text)
+    End If
+
+End Sub
+
+Private Sub chAtivo_Click()
+    If chAtivo.Value = 1 Then
+        chInativo.Value = 0
+    End If
+
+    MontaGridPesquisaCliente
+    carregaClienteGrid
+    
+End Sub
+
+Private Sub chCheque_GotFocus()
+    COLORE_FOCO chCheque
+End Sub
+Private Sub chCheque_LostFocus()
+    COLORE_DESFOCO chCheque
+End Sub
+
+Private Sub chCredito_GotFocus()
+    COLORE_FOCO chCredito
+End Sub
+Private Sub chCredito_LostFocus()
+    COLORE_DESFOCO chCredito
+End Sub
+
+Private Sub chDebito_GotFocus()
+    COLORE_FOCO chDebito
+End Sub
+Private Sub chDebito_LostFocus()
+    COLORE_DESFOCO chDebito
+End Sub
+
+Private Sub chInativo_Click()
+    If chInativo.Value = 1 Then
+        chAtivo.Value = 0
+    End If
+    
+    MontaGridPesquisaCliente
+    carregaClienteGrid
+End Sub
+
+Private Sub chPix_GotFocus()
+    COLORE_FOCO chPix
+End Sub
+Private Sub chPix_LostFocus()
+    COLORE_DESFOCO chPix
+End Sub
+
+Private Sub chPrazo_GotFocus()
+    COLORE_FOCO chPrazo
+End Sub
+Private Sub chPrazo_LostFocus()
+    COLORE_DESFOCO chPrazo
+End Sub
+
+Private Sub chTodas_GotFocus()
+    COLORE_FOCO chTodas
+End Sub
+Private Sub chTodas_LostFocus()
+    COLORE_DESFOCO chTodas
+End Sub
+
+Private Sub chVista_GotFocus()
+    COLORE_FOCO chVista
+End Sub
+Private Sub chVista_LostFocus()
+    COLORE_DESFOCO chVista
+End Sub
+
+Private Sub Form_Load()
+    txtDataHora.Text = Now
+    txtCodigo.Text = ULTCOD("PESS_CODIGO", "PESSOAS")
+    carregaSexo
+    carregaDecPessoa
+End Sub
+
+Private Sub carregaClienteGrid()
+
+    'MontaGridPesquisaCliente
+    
+    Dim rec As ADODB.Recordset
+    
+    CAMPO "*"
+    TABELA "PESSOAS"
+    
+    If chAtivo.Value = 1 Then
+        CONDICAO "PESS_STATUS = 'A'"
+    End If
+    
+    If chInativo.Value = 1 Then
+        CONDICAO "PESS_STATUS = 'E'"
+    End If
+    
+    SELECIONE rec
+    
+    Do While Not rec.EOF
+    
+    ADDGRID rec("PESS_CAMPOX")
+    ADDGRID rec("PESS_CODIGO")
+    ADDGRID rec("PESS_DATAHORA")
+    ADDGRID rec("PESS_NOME")
+    ADDGRID rec("PESS_CPF")
+    ADDGRID rec("PESS_RG")
+    ADDGRID rec("PESS_FILIACAOMAE")
+    ADDGRID rec("PESS_FILIACAOPAI")
+    ADDGRID rec("PESS_SEXO")
+    ADDGRID rec("PESS_EMAIL")
+    ADDGRID rec("PESS_DATANASC")
+    ADDGRID rec("PESS_CELULAR")
+    ADDGRID rec("PESS_STATUS")
+    ADDGRID rec("PESS_DECPESSOA")
+    
+    ADICIONA_LINHA_GRID gridCliente, 1
+    
+    rec.MoveNext 'MOVER PARA PROXIMA LINHA
+    Loop
+        
+End Sub
+Private Sub MontaGridPesquisaCliente()
+
+    FGRID "X", 900, "E"
+    FGRID "Código", 900, "E"
+    FGRID "Data e Hora", 2500, "E"
+    FGRID "Nome", 4000, "E"
+    FGRID "CPF", 2500, "E"
+    FGRID "RG", 2500, "E"
+    FGRID "Nome Mãe", 4000, "E"
+    FGRID "Nome Pai", 4000, "E"
+    FGRID "Sexo", 1200, "E"
+    FGRID "Email", 3000, "E"
+    FGRID "Data Nasc", 1500, "E"
+    FGRID "Celular", 2500, "E"
+    FGRID "DecPessoa", 1500, "E"
+    FGRID "Status", 1200, "E"
+    FGRID "Dec.Pessoa", 1200, "E"
+    
+    MONTAR_GRID gridCliente, "Tahoma", 12
+    
+End Sub
+
+Private Sub gridPessoa_DblClick()
+    If LER_GRID(gridPessoa, gridPessoa.ROW, "X") = "X" Then
+        gridPessoa.TextMatrix(gridPessoa.ROW, LER_GRID_retorna_num_coluna(gridPessoa, "X")) = ""
+    Else
+        gridPessoa.TextMatrix(gridPessoa.ROW, LER_GRID_retorna_num_coluna(gridPessoa, "X")) = "X"
+    End If
+End Sub
+
+Private Sub mskCpf_GotFocus()
+    COLORE_FOCO mskCpf
+End Sub
+Private Sub mskCpf_LostFocus()
+    COLORE_DESFOCO mskCpf
+End Sub
+
+Private Sub mskDataNasc_GotFocus()
+    COLORE_FOCO mskDataNasc
+End Sub
+Private Sub mskDataNasc_LostFocus()
+    COLORE_DESFOCO mskDataNasc
+End Sub
+
+Private Sub mskRg_GotFocus()
+    COLORE_FOCO mskRg
+End Sub
+Private Sub mskRg_LostFocus()
+    COLORE_DESFOCO mskRg
+End Sub
+
+Private Sub txtBuscar_Change()
+    
+    txtBuscar.Text = Replace(txtBuscar.Text, "'", "")
+    MontaGridPesquisaCliente
+    
+    Dim rec As New ADODB.Recordset
+    
+    CAMPO "*"
+    TABELA "PESSOAS"
+    CONDICAO "PESS_NOME LIKE '" & txtBuscar.Text & "%'"
+    
+    If chAtivo.Value Then
+        CONDICAO "PESS_STATUS = 'A'"
+    End If
+    
+    If chInativo.Value Then
+        CONDICAO "PESS_STATUS = 'E'"
+    End If
+    
+    SELECIONE rec
+    
+    Do While Not rec.EOF
+    
+    ADDGRID rec("PESS_CAMPOX")
+    ADDGRID rec("PESS_CODIGO")
+    ADDGRID rec("PESS_DATAHORA")
+    ADDGRID rec("PESS_NOME")
+    ADDGRID rec("PESS_CPF")
+    ADDGRID rec("PESS_RG")
+    ADDGRID rec("PESS_FILIACAOMAE")
+    ADDGRID rec("PESS_FILIACAOPAI")
+    ADDGRID rec("PESS_SEXO")
+    ADDGRID rec("PESS_EMAIL")
+    ADDGRID rec("PESS_DATANASC")
+    ADDGRID rec("PESS_CELULAR")
+    ADDGRID NULO(rec("PESS_DECPESSOA"))
+    ADDGRID rec("PESS_STATUS")
+    
+    ADICIONA_LINHA_GRID gridCliente, 1
+    
+    
+    rec.MoveNext 'MOVER PARA PROXIMA LINHA
+    Loop
+    
+End Sub
+
+Private Sub txtCodigo_GotFocus()
+    COLORE_FOCO txtCodigo
+   On Error Resume Next
+   txtCodigo.SelStart = 0
+   txtCodigo.SelLength = Len(txtCodigo.Text)
+End Sub
+
+Private Sub txtCodigo_KeyDown(KeyCode As Integer, Shift As Integer)
+    Select Case KeyCode
+    
+    Case 13
+    
+    If TRAZ("SELECT count(PESS_CODIGO) FROM PESSOAS WHERE PESS_CODIGO = '" & txtCodigo.Text & "'") = "0" Then
+        If MsgBox("Código sem registro. Deseja registrar um Cliente a esse Código?", vbYesNo + vbQuestion, "Excluir") = vbYes Then
+            LimparCampos2
+            txtDataHora.Text = Now
+            txtNome.SelStart = Len(txtCodigo.Text)
+            txtNome.SetFocus
+            Exit Sub
+        Else
+            MsgBox "Registro cancelado"
+            limparCampos
+            txtDataHora.Text = Now
+            txtCodigo.Text = ULTCOD("PESS_CODIGO", "PESSOAS")
+            txtCodigo.SelStart = Len(txtCodigo.Text)
+            txtCodigo.SetFocus
+            Exit Sub
+        End If
+    End If
+    
+    LimparCampos2
+    carregaCliente
+    
+    txtCodigo.SetFocus
+    
+    End Select
+    
+End Sub
+
+Private Sub txtCodigo_LostFocus()
+    COLORE_DESFOCO txtCodigo
+    
+    If txtCodigo.Text = "" Then
+        MsgBox "Preencha o campo código!"
+        txtCodigo.SelStart = Len(txtCodigo.Text)
+        txtCodigo.SetFocus
+    ElseIf Not IsNumeric(txtCodigo.Text) Then
+        MsgBox "Apenas números!"
+        txtCodigo.Text = ""
+        txtCodigo.SetFocus
+        txtDataHora.Text = Now
+    End If
+End Sub
+
+Private Sub txtCodigo_KeyPress(KeyAscii As Integer)
+   KeyAscii = Asc(UCase(Chr(KeyAscii)))
+End Sub
+
+Private Sub txtDataHora_GotFocus()
+    COLORE_FOCO txtDataHora
+   On Error Resume Next
+   txtDataHora.SelStart = 0
+   txtDataHora.SelLength = Len(txtDataHora.Text)
+End Sub
+Private Sub txtDataHora_LostFocus()
+    COLORE_DESFOCO txtDataHora
+End Sub
+
+Private Sub txtDataHora_KeyPress(KeyAscii As Integer)
+   KeyAscii = Asc(UCase(Chr(KeyAscii)))
+End Sub
+
+Private Sub txtNome_GotFocus()
+    COLORE_FOCO txtNome
+   On Error Resume Next
+   txtNome.SelStart = 0
+   txtNome.SelLength = Len(txtNome.Text)
+End Sub
+Private Sub txtNome_LostFocus()
+    COLORE_DESFOCO txtNome
+End Sub
+
+Private Sub txtNome_KeyPress(KeyAscii As Integer)
+
+    If Not (KeyAscii >= 65 And KeyAscii <= 90) And Not (KeyAscii >= 97 And KeyAscii <= 122) And Not (KeyAscii = 8) Then
+        KeyAscii = 0
+    End If
+    
+End Sub
+
+Private Sub txtCelular_GotFocus()
+    COLORE_FOCO txtCelular
+   On Error Resume Next
+   txtCelular.SelStart = 0
+   txtCelular.SelLength = Len(txtCelular.Text)
+End Sub
+Private Sub txtCelular_LostFocus()
+    COLORE_DESFOCO txtCelular
+    
+    If Not IsNumeric(txtCelular.Text) Then
+        MsgBox "Apenas números!", vbExclamation
+        txtCelular.Text = ""
+        txtCelular.SetFocus
+    End If
+End Sub
+
+Private Sub txtCelular_KeyPress(KeyAscii As Integer)
+   KeyAscii = Asc(UCase(Chr(KeyAscii)))
+End Sub
+
+Private Sub txtEmail_GotFocus()
+    COLORE_FOCO txtEmail
+   On Error Resume Next
+   txtEmail.SelStart = 0
+   txtEmail.SelLength = Len(txtEmail.Text)
+End Sub
+Private Sub txtEmail_LostFocus()
+    COLORE_DESFOCO txtEmail
+    
+    'emailPattern = "^\w+(\.-)?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+    emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    
+    Set regex = CreateObject("VBScript.RegExp")
+    
+    regex.Pattern = emailPattern
+    
+    email = txtEmail.Text
+    
+    If txtEmail.Text = "" Then
+        Exit Sub
+    End If
+    
+    If regex.test(email) Then
+    Else
+        MsgBox "Endereço de Email inválido"
+        txtEmail.Text = ""
+        txtEmail.SetFocus
+    End If
+    
+    
+    Set regex = Nothing
+    
+    
+End Sub
+
+Private Sub txtEmail_KeyPress(KeyAscii As Integer)
+   KeyAscii = Asc(UCase(Chr(KeyAscii)))
+End Sub
+
+Private Sub txtFiliacaoMae_GotFocus()
+    COLORE_FOCO txtFiliacaoMae
+   On Error Resume Next
+   txtFiliacaoMae.SelStart = 0
+   txtFiliacaoMae.SelLength = Len(txtFiliacaoMae.Text)
+End Sub
+Private Sub txtFiliacaoMae_LostFocus()
+    COLORE_DESFOCO txtFiliacaoMae
+End Sub
+
+Private Sub txtFiliacaoMae_KeyPress(KeyAscii As Integer)
+
+   If Not (KeyAscii >= 65 And KeyAscii <= 90) And Not (KeyAscii >= 97 And KeyAscii <= 122) And Not (KeyAscii = 8) Then
+        KeyAscii = 0
+    End If
+
+End Sub
+
+Private Sub txtFiliacaoPai_GotFocus()
+    COLORE_FOCO txtFiliacaoPai
+   On Error Resume Next
+   txtFiliacaoPai.SelStart = 0
+   txtFiliacaoPai.SelLength = Len(txtFiliacaoPai.Text)
+End Sub
+Private Sub txtFiliacaoPai_LostFocus()
+    COLORE_DESFOCO txtFiliacaoPai
+End Sub
+
+Private Sub txtFiliacaoPai_KeyPress(KeyAscii As Integer)
+   
+   If Not (KeyAscii >= 65 And KeyAscii <= 90) And Not (KeyAscii >= 97 And KeyAscii <= 122) And Not (KeyAscii = 8) Then
+        KeyAscii = 0
+    End If
+    
+End Sub
+
+Private Sub txtObservacao_GotFocus()
+   On Error Resume Next
+   txtObservacao.SelStart = 0
+   txtObservacao.SelLength = Len(txtObservacao.Text)
+End Sub
+
+Private Sub txtObservacao_KeyPress(KeyAscii As Integer)
+   KeyAscii = Asc(UCase(Chr(KeyAscii)))
+End Sub
+
+Private Sub cbSexo_GotFocus()
+    COLORE_FOCO cbSexo
+   On Error Resume Next
+   cbSexo.SelStart = 0
+   cbSexo.SelLength = Len(cbSexo.Text)
+End Sub
+Private Sub cbSexo_LostFocus()
+    COLORE_DESFOCO cbSexo
+End Sub
+Private Sub cbSexo_KeyPress(KeyAscii As Integer)
+    KeyAscii = 0
+End Sub
+
+Private Sub cbDecPessoa_GotFocus()
+    COLORE_FOCO cbDecPessoa
+   On Error Resume Next
+   cbDecPessoa.SelStart = 0
+   cbDecPessoa.SelLength = Len(cbDecPessoa.Text)
+End Sub
+Private Sub cbDecPessoa_LostFocus()
+    COLORE_DESFOCO cbDecPessoa
+End Sub
+Private Sub cbDecPessoa_KeyPress(KeyAscii As Integer)
+    KeyAscii = 0
+End Sub
+
+Private Sub txtBuscar_GotFocus()
+   On Error Resume Next
+   txtBuscar.SelStart = 0
+   txtBuscar.SelLength = Len(txtBuscar.Text)
+End Sub
+
+Private Sub txtBuscar_KeyPress(KeyAscii As Integer)
+   KeyAscii = Asc(UCase(Chr(KeyAscii)))
+End Sub
+Private Sub limparCampos()
+    txtCodigo.Text = ""
+    txtDataHora.Text = ""
+    txtNome.Text = ""
+    
+    Temp = mskRg.MASK
+    mskRg.MASK = ""
+    mskRg.Text = ""
+    mskRg.MASK = Temp
+    
+    Temp = mskCpf.MASK
+    mskCpf.MASK = ""
+    mskCpf.Text = ""
+    mskCpf.MASK = Temp
+    
+    Temp = mskDataNasc.MASK
+    mskDataNasc.MASK = ""
+    mskDataNasc.Text = ""
+    mskDataNasc.MASK = Temp
+    
+    cbSexo.Text = ""
+    txtCelular.Text = ""
+    cbDecPessoa.Text = ""
+    txtEmail.Text = ""
+    txtFiliacaoMae.Text = ""
+    txtFiliacaoPai.Text = ""
+    txtObservacao.Text = ""
+    chVista.Value = "0"
+    chCredito.Value = "0"
+    chCheque.Value = "0"
+    chPix.Value = "0"
+    chPrazo.Value = "0"
+    chDebito.Value = "0"
+    chTodas.Value = "0"
+End Sub
+
+Private Sub LimparCampos2()
+    
+    txtDataHora.Text = ""
+    txtNome.Text = ""
+    
+    Temp = mskRg.MASK
+    mskRg.MASK = ""
+    mskRg.Text = ""
+    mskRg.MASK = Temp
+    
+    Temp = mskCpf.MASK
+    mskCpf.MASK = ""
+    mskCpf.Text = ""
+    mskCpf.MASK = Temp
+    
+    Temp = mskDataNasc.MASK
+    mskDataNasc.MASK = ""
+    mskDataNasc.Text = ""
+    mskDataNasc.MASK = Temp
+    
+    cbSexo.Text = ""
+    txtCelular.Text = ""
+    cbDecPessoa.Text = ""
+    txtEmail.Text = ""
+    txtFiliacaoMae.Text = ""
+    txtFiliacaoPai.Text = ""
+    txtObservacao.Text = ""
+    chVista.Value = "0"
+    chCredito.Value = "0"
+    chCheque.Value = "0"
+    chPix.Value = "0"
+    chPrazo.Value = "0"
+    chDebito.Value = "0"
+    chTodas.Value = "0"
+End Sub
+Private Sub carregaCliente()
+    Dim rec As New ADODB.Recordset
+    
+    CAMPO "*"
+    TABELA "PESSOAS"
+    'CONDICAO "PESS_CODIGO = '" & txtCodigo.TEXT & "'"
+    SELECIONE rec
+    
+    If Not rec.EOF Then
+        txtDataHora.Text = rec("PESS_DATAHORA")
+        txtNome.Text = rec("PESS_NOME")
+        mskRg.Text = rec("PESS_RG")
+        mskDataNasc.Text = rec("PESS_DATANASC")
+        mskCpf.Text = rec("PESS_CPF")
+        txtCelular.Text = rec("PESS_EMAIL")
+        txtEmail.Text = rec("PESS_EMAIL")
+        txtFiliacaoMae.Text = rec("PESS_FILIACAOMAE")
+        txtFiliacaoPai.Text = rec("PESS_FILIACAOPAI")
+        
+        If rec("PESS_SEXO") = "M" Then
+            cbSexo.Text = "Masculino"
+        Else
+            cbSexo.Text = "Feminino"
+        End If
+        
+        If rec("PESS_DECPESSOA") = "PF" Then
+            cbDecPessoa = "Fisica"
+        Else
+            cbDecPessoa = "Juridica"
+        End If
+        
+        If rec("PESS_FORMA_AVISTA") = "S" Then
+            chVista = 1
+        End If
+        
+        If rec("PESS_FORMA_CCREDITO") = "S" Then
+            chCredito = 1
+        End If
+        
+        If rec("PESS_FORMA_CHEQUE") = "S" Then
+            chCheque.Value = 1
+        End If
+        
+        If rec("PESS_FORMA_APRAZO") = "S" Then
+            chPrazo.Value = 1
+        End If
+        
+        If rec("PESS_FORMA_CDEBITO") = "S" Then
+            chDebito.Value = 1
+        End If
+        
+        If rec("PESS_FORMA_PIX") = "S" Then
+            chPix.Value = 1
+        End If
+        
+        If rec("PESS_FORMA_TODAS") = "S" Then
+            chTodas.Value = 1
+        End If
+        
+    End If
+End Sub
+Private Sub carregaSexo()
+    cbSexo.Clear
+    cbSexo.AddItem "Masculino"
+    cbSexo.AddItem "Feminino"
+End Sub
+Private Sub carregaDecPessoa()
+    cbDecPessoa.Clear
+    cbDecPessoa.AddItem "Fisica"
+    cbDecPessoa.AddItem "Juridica"
+End Sub
+Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
+    Select Case KeyCode
+    Case vbKeyEscape
+    Unload Me
+    
+    Case vbKeyF1
+    btnNovo_Click
+    
+    Case vbKeyF2
+    btnSalvar_Click
+    
+    Case vbKeyF3
+    btnExcluir_Click
+    
+    Case vbKeyF4
+    btnAlterar_Click
+    
+    Case vbKeyEntrar
+    fmrCadastroPessoa.Show
+    
+    End Select
+End Sub
