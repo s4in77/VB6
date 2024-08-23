@@ -1,0 +1,189 @@
+Private Sub Text1_GotFocus()
+   On Error Resume Next
+   Text1.SelStart = 0
+   Text1.SelLength = Len(Text1.Text)
+End Sub
+
+Private Sub Text1_KeyPress(KeyAscii As Integer)
+   KeyAscii = Asc(UCase(Chr(KeyAscii)))
+End Sub
+
+Private Sub carregaPessoa()
+    Dim rec As ADODB.Recordset
+    
+    CAMPO "*"
+    TABELA "PESSOA"
+    
+    If rbAtivo.Value Then
+        CONDICAO "PES_STATUS = 'A'"
+    End If
+    
+    If rbInativo.Value Then
+        CONDICAO "PES_STATUS = 'E'"
+    End If
+    
+    If chbFisica.Value Then
+        CONDICAO "PES_DECPESSOA = 'F'"
+    End If
+    
+    If chbJuridico.Value Then
+        CONDICAO "PES_DECPESSOA = 'J'"
+    End If
+    
+    SELECIONE rec
+    
+    Do While Not rec.EOF
+    
+    ADDGRID rec("PES_X")
+    ADDGRID rec("PES_CODIGO")
+    ADDGRID rec("PES_DATAHORA")
+    ADDGRID rec("PES_NOME")
+    ADDGRID rec("PES_CPF")
+    ADDGRID rec("PES_RG")
+    ADDGRID rec("PES_FILIACAOMAE")
+    ADDGRID rec("PES_FILIACAOPAI")
+    ADDGRID rec("PES_SEXO")
+    ADDGRID rec("PES_EMAIL")
+    ADDGRID rec("PES_DATANASC")
+    ADDGRID rec("PES_ENDERECO")
+    ADDGRID rec("PES_CELULAR")
+    ADDGRID rec("PES_BAIRRO")
+    ADDGRID rec("PES_NUMERO")
+    ADDGRID rec("PES_CIDADE")
+    ADDGRID rec("PES_ESTADO")
+    ADDGRID rec("PES_CEP")
+    ADDGRID NULO(rec("PES_DECPESSOA"))
+    
+    ADICIONA_LINHA_GRID gridPessoa, 1
+    
+    rec.MoveNext ' MOVER PARA PROXIMA LINHA
+    Loop
+End Sub
+Private Sub MontaGridPesquisaPessoa()
+
+    FGRID "X", 300, "E"
+    FGRID "Codigo", 900, "E"
+    FGRID "Data e Hora", 2500, "E"
+    FGRID "Nome", 4000, "E"
+    FGRID "CPF", 2500, "E"
+    FGRID "RG", 2500, "E"
+    FGRID "Nome Mãe", 4000, "E"
+    FGRID "Nome Pai", 4000, "E"
+    FGRID "Sexo", 1200, "E"
+    FGRID "Email", 2500, "E"
+    FGRID "Data Nasc", 2500, "E"
+    FGRID "Endereco", 4000, "E"
+    FGRID "Celular", 1200, "E"
+    FGRID "Bairro", 3000, "E"
+    FGRID "Numero", 1200, "E"
+    FGRID "Cidade", 1200, "E"
+    FGRID "Estdo", 1200, "E"
+    FGRID "CEP", 1200, "E"
+    FGRID "Dec.Pessoa", 900, "E"
+    
+    MONTAR_GRID gridPessoa, "Tahoma", 12
+    
+End Sub
+
+Private Sub txtBuscar_GotFocus()
+    COLORE_FOCO txtBuscar
+End Sub
+Private Sub txtBuscar_LostFocus()
+    COLORE_DESFOCO txtBuscar
+End Sub
+
+Private Sub txtBuscar_Change()
+    txtBuscar.Text = Replace(txtBuscar.Text, "'", "")
+    MontaGridPesquisaPessoa
+    
+    Dim rec As ADODB.Recordset
+    
+    CAMPO "*"
+    TABELA "PESSOA"
+    CONDICAO "PES_NOME LIKE '" & txtBuscar.Text & "%'"
+    
+    If rbAtivo.Value Then
+        CONDICAO "PES_STATUS = 'A'"
+    End If
+    
+    If rbInativo.Value Then
+        CONDICAO "PES_STATUS = 'E'"
+    End If
+    
+    If chbFisica.Value Then
+        CONDICAO "PES_DECPESSOA = 'F'"
+    End If
+    
+    If chbJuridico.Value Then
+        CONDICAO "PES_DECPESSOA = 'J'"
+    End If
+    
+    SELECIONE rec
+    
+    Do While Not rec.EOF
+        ADDGRID ""
+        ADDGRID rec("PES_CODIGO")
+        ADDGRID rec("PES_DATAHORA")
+        ADDGRID rec("PES_NOME")
+        ADDGRID rec("PES_CPF")
+        ADDGRID rec("PES_RG")
+        ADDGRID rec("PES_FILIACAOMAE")
+        ADDGRID rec("PES_FILIACAOPAI")
+        ADDGRID rec("PES_SEXO")
+        ADDGRID rec("PES_EMAIL")
+        ADDGRID rec("PES_DATANASC")
+        ADDGRID rec("PES_ENDERECO")
+        ADDGRID rec("PES_CELULAR")
+        ADDGRID rec("PES_BAIRRO")
+        ADDGRID rec("PES_NUMERO")
+        ADDGRID rec("PES_CIDADE")
+        ADDGRID rec("PES_ESTADO")
+        ADDGRID rec("PES_CEP")
+        ADDGRID NULO(rec("PES_DECPESSOA"))
+        
+        ADICIONA_LINHA_GRID gridPessoa, 1
+        
+        rec.MoveNext ' MOVER PARA PROXIMA LINHA
+    Loop
+        
+    
+End Sub
+
+Private Sub Form_Load()
+    MontaGridPesquisaPessoa
+    carregaPessoa
+End Sub
+Private Sub chbFisica_Click()
+    If chbFisica.Value Then
+        chbJuridico.Value = False
+    End If
+    MontaGridPesquisaPessoa
+    carregaPessoa
+End Sub
+Private Sub chbJuridico_Click()
+    If chbJuridico.Value Then
+        chbFisica = False
+    End If
+    MontaGridPesquisaPessoa
+    carregaPessoa
+End Sub
+
+Private Sub rbAtivo_Click()
+    MontaGridPesquisaPessoa
+    carregaPessoa
+End Sub
+Private Sub rbInativo_Click()
+    If rbInativo.Value = True Then
+        rbAtivo.Value = False
+    End If
+    
+    MontaGridPesquisaPessoa
+    carregaPessoa
+End Sub
+Private Sub gridPessoa_DblClick()
+    If LER_GRID(gridPessoa, gridPessoa.ROW, "X") = "X" Then
+        gridPessoa.TextMatrix(gridPessoa.ROW, LER_GRID_retorna_num_coluna(gridPessoa, "X")) = ""
+    Else
+        gridPessoa.TextMatrix(gridPessoa.ROW, LER_GRID_retorna_num_coluna(gridPessoa, "X")) = "X"
+    End If
+End Sub
